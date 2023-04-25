@@ -1,0 +1,39 @@
+import discord
+from discord.ext import commands
+
+intents = discord.Intents.default()
+intents.messages = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+# Bot events
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content.startswith('!organize'):
+        # Your message organization code goes here
+        organized_messages = organize_messages(message.channel)
+        await message.channel.send(organized_messages)
+
+# Function to organize messages
+def organize_messages(channel):
+    messages = []
+    async for message in channel.history(limit=100):
+        try:
+            number = float(message.content)
+            messages.append(number)
+        except ValueError:
+            pass
+
+    messages.sort()
+    organized_messages = "\n".join(map(str, messages))
+    return organized_messages
+
+# Run the bot
+bot.run('YOUR_BOT_TOKEN')
